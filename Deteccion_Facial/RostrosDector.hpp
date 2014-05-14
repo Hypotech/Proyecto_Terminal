@@ -11,7 +11,7 @@ using namespace cv;
 class DectorRostros
 {
 public:
-DectorRostros(float escl = 1.1, double min = 0.16, double max = 0.8, int vecinos = 2);
+    DectorRostros(float escl = 1.1, double min = 0.16, double max = 0.8, int vecinos = 2);
 
     bool EscanearImagen(const Mat &ImagenEntrada, vector<Rect>& UbicacionConRect);
 

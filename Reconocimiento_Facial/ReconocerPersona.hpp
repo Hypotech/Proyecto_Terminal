@@ -5,14 +5,14 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/contrib/contrib.hpp"
 
-#define FILE_CSV "./indexBD2.csv"
+#define FILE_CSV "./index.csv"
 
 using namespace cv;
 using namespace std;
 class ReconocerdordePersona
 {
 public:
-    ReconocerdordePersona();
+    ReconocerdordePersona(int Neigen = 8, double ranConfia = 0, int radio = 1,int regX = 8, int regY = 8);
 
     int consulatarBD(Mat& ImagenRostro) const;
 

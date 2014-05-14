@@ -9,7 +9,7 @@
 using namespace cv;
 using namespace std;
 
-ReconocerdordePersona::ReconocerdordePersona(): Ruta_a_CSV(FILE_CSV)
+ReconocerdordePersona::ReconocerdordePersona(int Neigen, double ranConfia, int radio,int regX, int regY): Ruta_a_CSV(FILE_CSV)
 {
     vector <Mat> imagenes;
     vector<int> etiquetas;
@@ -18,7 +18,9 @@ ReconocerdordePersona::ReconocerdordePersona(): Ruta_a_CSV(FILE_CSV)
 
     obtenerParametrosCSV(Ruta_a_CSV,imagenes, etiquetas);
 
-    Reconocedor = createEigenFaceRecognizer();
+    Reconocedor = createLBPHFaceRecognizer(radio,Neigen,regX, regY,ranConfia);
+    // Reconocedor = createEigenFaceRecognizer(Neigen,ranConfia);
+    //Reconocedor = createFisherFaceRecognizer(Neigen,ranConfia);
     cout<<"Entrenando..."<<endl;
     Reconocedor->train(imagenes,etiquetas);
 

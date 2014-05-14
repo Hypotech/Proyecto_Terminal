@@ -1,9 +1,10 @@
 #include <iostream>
 #include "Reconocimiento_Facial/ReconocerPersona.hpp"
 #include "Deteccion_Facial/RostrosDector.hpp"
-#include "Deteccion_Facial/Camara.hpp"
+#include "Camara/Camara.hpp"
 #include"cv.hpp"
 #include <iostream>
+#define ESCALA_TEXT 2
 
 using namespace cv;
 using namespace std;
@@ -12,7 +13,8 @@ int main(int argc, char *argv[])
 {
     Camara CamLaptop;
     DectorRostros DectorCamLaptop;
-    ReconocerdordePersona ReconocedorCamLaptop;
+    ReconocerdordePersona ReconocedorCamLaptop(atoi(argv[3]),atof(argv[4]), atoi(argv[5]), atoi(argv[6]), atoi(argv[7]));
+    //ReconocerdordePersona ReconocedorCamLaptop(atoi(argv[3]),atof(argv[4]) );
     Mat UnFrame;
     vector<Rect> MarcosRostros;
     Scalar colorAzul(255,0,0); //representa el color azul en BGR
@@ -32,21 +34,29 @@ int main(int argc, char *argv[])
 		rectangle(UnFrame, *Rostro, colorAzul); //( Mat& input , Rect , const Scalar& color, int thickness, int line type, int shift ), se dibuja un rectangulo en la imagen original
 
 		cvtColor(UnFrame(*Rostro), ImagenRostro,CV_BGR2GRAY);
-		Mat RostroNormalizado( 112,92,ImagenRostro.type() );
+		Mat RostroNormalizado(atoi(argv[2]), atoi(argv[1]) ,ImagenRostro.type() );
 
 		resize(ImagenRostro, RostroNormalizado, RostroNormalizado.size(), 0, 0, INTER_LINEAR);
-		cout<< "Rostro Normalizado... finalizado"<< endl;
 		int IDpersona = ReconocedorCamLaptop.consulatarBD(RostroNormalizado);
 
-		if(IDpersona == -1)
+		Point P(Rostro->x, Rostro->y);
+
+		if(IDpersona == -1){
+		    putText(UnFrame,"Rostro desconocido" ,P ,FONT_HERSHEY_PLAIN, ESCALA_TEXT, colorAzul);
 		    cout<< "Rostro desconocido"<<endl;
-		else
-		    cout<< "Rostro encontrado: Persona con ID" << IDpersona << endl;
+		}
+		else if(IDpersona == 1){
+		    putText(UnFrame, "Christian",P ,FONT_HERSHEY_PLAIN, ESCALA_TEXT, colorAzul);
+		    cout<< "Rostro encontrado: Persona con ID " << IDpersona << endl;
+		}
+		else{
+		    putText(UnFrame,format("Subjeto ID %d", IDpersona),P ,FONT_HERSHEY_PLAIN, ESCALA_TEXT, colorAzul);
+		    cout<< "Rostro encontrado: Persona con ID " << IDpersona << endl;
+		}
 	    }  
 
 	    imshow("Prueba",UnFrame);
 	
-	    //	   waitKey(0);
 	    if(waitKey(30) == 27) break;  
 	}
     return 0;
