@@ -1,5 +1,5 @@
 #Este es el make file para construir el Detector de rostros desde la webcam de mi laptop
-#MODIFICADO: 30 de abril del 2014
+#MODIFICADO: 14 de mayo del 2014
 
 CFLAGS = `pkg-config --cflags opencv`
 LIBS = `pkg-config --libs opencv`

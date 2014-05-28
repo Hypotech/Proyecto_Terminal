@@ -1,0 +1,21 @@
+#include "Emisor/EmisorDeImag.hpp"
+#define IP_SERVIDOR "192.168.1.116"
+#include "RaspiCamCV.h"
+
+int main(int argc, char *argv[])
+{
+    EmisorDeImagenes Raspberry(IP_SERVIDOR);
+    RaspiCamCvCapture* ptrVideoStruct1 = raspiCamCvCreateCameraCapture(0); // structura que apunta al flujo de video camara
+
+    // assert(ptrVideoStruct1 != NULL);
+
+    IplImage* ptrFrame; //apuntador a un frame del video
+
+    ptrFrame = raspiCamCvQueryFrame ( ptrVideoStruct1 );
+    cv::Mat FrameEnviar (ptrFrame);
+    Raspberry.enviar(FrameEnviar);
+    std::cout << "Imagen Enviada con exito" << std::endl;
+
+    return 0;
+}
+
