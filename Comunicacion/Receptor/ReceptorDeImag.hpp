@@ -11,7 +11,7 @@ class ReceptorDeImagen
 public:
     ReceptorDeImagen(const char* const IP);
     ~ReceptorDeImagen();
-    void Recibir(cv::Mat &);
+    bool Recibir(cv::Mat &);
     int EsperarConexion();
 private:
     int DescripDeConex;

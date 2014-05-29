@@ -30,33 +30,34 @@ int ReceptorDeImagen::EsperarConexion()
     return DescripDeConexEmisor;
 }
 
-void ReceptorDeImagen::Recibir(cv::Mat& ImgRecibida)
+bool ReceptorDeImagen::Recibir(cv::Mat& ImgRecibida)
 {
-    // ImgRecibida =cv::Mat::zeros(150,150, CV_8UC3);
-    ImgRecibida =cv::Mat::zeros(480,640, CV_8UC1);
-    // ImgRecibida =cv::Mat::zeros(480,640, CV_8UC3);
+    // ImgRecibida =cv::Mat::zeros(480,640, CV_8UC3); //color
+    ImgRecibida =cv::Mat::zeros(480,640, CV_8UC1); //ByN
     size_t PesoImagen = ImgRecibida.total() * ImgRecibida.elemSize();
     uchar BufferDatos[PesoImagen];
 
     ssize_t bytes = 0;
     int i;
     for (i = 0; i < PesoImagen; i+=bytes) {
-	if ( (bytes = recv(DescripDeConexEmisor, BufferDatos+i,PesoImagen-i,0)) == -1)
+	if ( (bytes = recv(DescripDeConexEmisor, BufferDatos+i,PesoImagen-i,0)) == -1){
 	    std::cout << "Error: Fallo llamada recv al intentar recibir Datos" << std::endl;
+	    return false;
+	}
       }
 
-    std::cout << "Total de bytes recibidos: " <<  i << std::endl;
+    // std::cout << "Total de bytes recibidos: " <<  i << std::endl;
 
 
     int ptr = 0;
     for (int i = 0; i < ImgRecibida.rows; i++) {
 	for (int j = 0; j < ImgRecibida.cols; j++) {
 	    ImgRecibida.at<uchar>(i,j) = BufferDatos[ptr];
-	    // ImgRecibida.at<cv::Vec3b>(i,j) = cv::Vec3b(BufferDatos[ptr+0], BufferDatos[ptr+1], BufferDatos[ptr+2]);
-	    // ptr = ptr+3;
+	    // ImgRecibida.at<cv::Vec3b>(i,j) = cv::Vec3b(BufferDatos[ptr+0], BufferDatos[ptr+1], BufferDatos[ptr+2]); //color
+	    // ptr = ptr+3; //color
 	    ptr++;
 	}
 
     }
-
+    return true;
 }

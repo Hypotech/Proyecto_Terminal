@@ -11,17 +11,17 @@ using namespace cv;
 class DectorRostros
 {
 public:
-    DectorRostros(float escl = 1.1, double min = 0.16, double max = 0.8, int vecinos = 2);
+    DectorRostros();//float escl = 1.1, double min = 50, double max = 50, int vecinos = 4);
 
-    bool EscanearImagen(const Mat &ImagenEntrada, vector<Rect>& UbicacionConRect);
-
+    void EscanearImagen(const Mat &ImagenEntrada, vector<Rect>& UbicacionConRect);
+    bool clasificadorCargado();
 private:
     CascadeClassifier Detector_en_Cascada;
 
-    double Escala;
-    double minimoTamanyo; //tamanyo minimo posible a detectar de los rostros en el video
-    double maximoTamnyo; //tamnyo maximo posible a detectar de los rostros en el video
-    int Vecinos;
+    // double Escala;
+    // double minimoTamanyo; //tamanyo minimo posible a detectar de los rostros 
+    // double maximoTamnyo; //tamnyo maximo posible a detectar de los rostros
+    // int Vecinos;
 };
 
 
