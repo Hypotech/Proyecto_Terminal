@@ -7,26 +7,26 @@
 #include "opencv2/core/core.hpp"
 #include <arpa/inet.h>
 
-ReceptorDeImagen::ReceptorDeImagen(const char* const IP):InfoAddrReceptor{AF_INET, 2014, {inet_addr(IP)}},
+ReceptorDeImagen::ReceptorDeImagen( ):InfoAddrReceptor{AF_INET, 2014, {htonl(INADDR_ANY)}},
 TamInfoAddrEmisor( sizeof(InfoAddrEmisor)) 
 {
-    DescripDeConex = socket(AF_INET, SOCK_STREAM, 0);
+    DescriptorSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-    if ( bind(DescripDeConex,(struct sockaddr *) &InfoAddrReceptor, sizeof(InfoAddrReceptor)) == -1 ) // intentando asignar la direccion
-	std::cout<< "No se pudo asignar la direccion dada: " << IP << std::endl;
-    if( listen(DescripDeConex,1) == -1) // intenta habilitar para recepcion de conexs. con un cola
+    if ( bind(DescriptorSocket,(struct sockaddr *) &InfoAddrReceptor, sizeof(InfoAddrReceptor)) == -1 ) // intentando asignar la direccion
+	std::cout<< "No se pudo asignar direccion" << std::endl;
+    if( listen(DescriptorSocket,1) == -1) // intenta habilitar para recepcion de conexs. con un cola
 	std::cout << "No se pudo recibir peticiones de conexion. Fallo lamada listen" << std::endl;
 }
 
 ReceptorDeImagen::~ReceptorDeImagen()
 {
     close(DescripDeConexEmisor);
-    close(DescripDeConex);
+    close(DescriptorSocket);
 }
 
 int ReceptorDeImagen::EsperarConexion()
 {
-    DescripDeConexEmisor = accept(DescripDeConex,(struct sockaddr *) &InfoAddrEmisor, &TamInfoAddrEmisor);
+    DescripDeConexEmisor = accept(DescriptorSocket,(struct sockaddr *) &InfoAddrEmisor, &TamInfoAddrEmisor);
     return DescripDeConexEmisor;
 }
 
@@ -60,4 +60,14 @@ bool ReceptorDeImagen::Recibir(cv::Mat& ImgRecibida)
 
     }
     return true;
+}
+
+void ReceptorDeImagen::MandarApertura(int& ResulReconocimiento) const
+{
+    send(DescripDeConexEmisor, &ResulReconocimiento, sizeof(int),0);
+}
+
+void ReceptorDeImagen::cerrarConexion()
+{
+    close(DescripDeConexEmisor);
 }

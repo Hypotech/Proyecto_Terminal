@@ -20,7 +20,7 @@ ReconocerdordePersona::ReconocerdordePersona(int Neigen, double ranConfia, int r
 
     Reconocedor = createLBPHFaceRecognizer(radio,Neigen,regX, regY,ranConfia);
     // Reconocedor = createEigenFaceRecognizer(Neigen,ranConfia);
-    //Reconocedor = createFisherFaceRecognizer(Neigen,ranConfia);
+    // Reconocedor = createFisherFaceRecognizer(Neigen,ranConfia);
     cout<<"Entrenando..."<<endl;
     Reconocedor->train(imagenes,etiquetas);
 
@@ -30,6 +30,13 @@ ReconocerdordePersona::ReconocerdordePersona(int Neigen, double ranConfia, int r
 int ReconocerdordePersona::consulatarBD(Mat& ImagenRostro) const
 {
     return Reconocedor->predict(ImagenRostro); 
+}
+
+int ReconocerdordePersona::consulatarBD(Mat& ImagenRostro, double& confianza) const
+{
+    int label;
+    Reconocedor->predict(ImagenRostro, label, confianza); 
+    return label;
 }
 
 void ReconocerdordePersona::obtenerParametrosCSV(const string& ArchivoCSV, vector<Mat>& imagenes, vector <int>& etiquetas)
