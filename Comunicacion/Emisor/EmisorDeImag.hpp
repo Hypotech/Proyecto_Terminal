@@ -9,15 +9,18 @@
 class EmisorDeImagenes
 {
 public:
-    EmisorDeImagenes(const char* const IP);
+    EmisorDeImagenes();
     ~EmisorDeImagenes();
-    int enviar(cv::Mat& Img_a_Enviar) const; //envia la imagene que se le pase
+    int enviar(cv::Mat& Img_a_Enviar) const; //envia la imagen contenida en Img_a_Enviar
     int GetRespuesta() const;
+    int EsperarConexion();
 
 private:
-    int DescripDeConex; // descriptor de conexion
-    struct sockaddr_in infoAddrReceptor; //Estructura con la informacion acerca del tipo de direccion
-    void retardo(int segundos) const;
+    int DescriptorSocket;
+    int  DescripDeConexEmisor;
+
+    const struct sockaddr_in infoAddrEmisor; //informacion acerca de la direccion la raspberry
+//    void retardo(int segundos) const;
 };
 
 

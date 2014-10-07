@@ -12,18 +12,17 @@ class ReceptorDeImagen
 {
 public:
     ReceptorDeImagen();
+    ReceptorDeImagen(const char* const IP);
     ~ReceptorDeImagen();
     bool Recibir(cv::Mat &);
     int EsperarConexion();
     void MandarApertura(int& ResulReconocimiento) const;
     void cerrarConexion();
+    bool conectar(const char* const IP); //conectar con la IP especificada
 
 private:
-    int DescriptorSocket;
-    int  DescripDeConexEmisor;
-    const struct sockaddr_in InfoAddrReceptor;
+    int DescripDeConex;  // descriptor de conexion
     struct sockaddr_in InfoAddrEmisor;
-    unsigned int TamInfoAddrEmisor;
 };
 
 

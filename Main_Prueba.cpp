@@ -1,7 +1,7 @@
 #include "Reconocimiento_Facial/ReconocerPersona.hpp"
 #include "Deteccion_Facial/RostrosDector.hpp"
-//#include "Camara/Camara.hpp" // para acceder a la camara que se tenga conectada al equipo
-#include "Comunicacion/Receptor/ReceptorDeImag.hpp" //Para recibir imagenes de la raspberry
+//#include "Camara/Camara.hpp" // camara usb
+#include "Comunicacion/Receptor/ReceptorDeImag.hpp" //raspicam remota
 #include"cv.hpp"
 #include <iostream>
 #include <unistd.h>

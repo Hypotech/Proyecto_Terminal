@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas">
+        <file>add_button.png</file>
+        <file>cam_button.jpeg</file>
+        <file>config_button.png</file>
+        <file>minus_button.png</file>
+        <file>green_button.png</file>
+        <file>red_button.jpeg</file>
+    </qresource>
+</RCC>

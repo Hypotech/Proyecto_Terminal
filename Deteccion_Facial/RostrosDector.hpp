@@ -13,7 +13,7 @@ class DectorRostros
 public:
     DectorRostros();//float escl = 1.1, double min = 50, double max = 50, int vecinos = 4);
 
-    void EscanearImagen(const Mat &ImagenEntrada, vector<Rect>& UbicacionConRect);
+    void EscanearImagen(const Mat &ImagenEntrada, vector<Rect>& UbicacionConRect,const int minEscala);
     bool clasificadorCargado();
 private:
     CascadeClassifier Detector_en_Cascada;

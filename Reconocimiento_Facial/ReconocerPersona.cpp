@@ -9,7 +9,9 @@
 using namespace cv;
 using namespace std;
 
-ReconocerdordePersona::ReconocerdordePersona(int Neigen, double ranConfia, int radio,int regX, int regY): Ruta_a_CSV(FILE_CSV)
+ReconocerdordePersona::ReconocerdordePersona(int Neigen, double ranConfia, int radio,
+                                             int regX, int regY, int vecinos, metodo modelo)
+    : Ruta_a_CSV(FILE_CSV)
 {
     vector <Mat> imagenes;
     vector<int> etiquetas;
@@ -17,10 +19,8 @@ ReconocerdordePersona::ReconocerdordePersona(int Neigen, double ranConfia, int r
     cout << "Inicializando Reconocedor de rostros... "<< endl;
 
     obtenerParametrosCSV(Ruta_a_CSV,imagenes, etiquetas);
+    cambiarModelo (Neigen, ranConfia, radio, regX, regY, modelo);
 
-    Reconocedor = createLBPHFaceRecognizer(radio,Neigen,regX, regY,ranConfia);
-    // Reconocedor = createEigenFaceRecognizer(Neigen,ranConfia);
-    // Reconocedor = createFisherFaceRecognizer(Neigen,ranConfia);
     cout<<"Entrenando..."<<endl;
     Reconocedor->train(imagenes,etiquetas);
 
@@ -66,4 +66,15 @@ void ReconocerdordePersona::obtenerParametrosCSV(const string& ArchivoCSV, vecto
 		}
 	}
 
+}
+
+void ReconocerdordePersona::cambiarModelo(int Neigen, double ranConfia, int radio, int regX,
+                                          int regY, int vecinos, metodo modelo)
+{
+    if (modelo == LBPH)
+        Reconocedor = createLBPHFaceRecognizer(radio,Neigen,regX, regY,ranConfia);
+    else if (modelo == fisher)
+        Reconocedor = createFisherFaceRecognizer(Neigen,ranConfia);
+    else
+        Reconocedor = createEigenFaceRecognizer(Neigen,ranConfia);
 }

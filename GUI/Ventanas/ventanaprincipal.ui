@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaPrincipal</class>
+ <widget class="QMainWindow" name="VentanaPrincipal">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Cerradura</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>100</y>
+      <width>551</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="vLayout_Opciones_Btns">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>81</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="Btn_VerRaspcam">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Ver RaspiCam</string>
+         </property>
+         <property name="icon">
+          <iconset resource="utiles.qrc">
+           <normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/cam_button.jpeg</normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/cam_button.jpeg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Agregar_Usr">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Agregar Usuario</string>
+         </property>
+         <property name="icon">
+          <iconset resource="utiles.qrc">
+           <normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/add_button.png</normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/add_button.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>81</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="Btn_Cofiguracion">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Configuracion</string>
+         </property>
+         <property name="icon">
+          <iconset resource="utiles.qrc">
+           <normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/config_button.png</normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/config_button.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Quitar_Usr">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Quitar Usuario</string>
+         </property>
+         <property name="icon">
+          <iconset resource="utiles.qrc">
+           <normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/minus_button.png</normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/minus_button.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>801</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="vLayout_PanelConexion">
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="hlLayout_Conexion" stretch="0,0,0,0,0,0">
+       <property name="spacing">
+        <number>13</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="Btn_Conectar">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="text">
+          <string>Conectar</string>
+         </property>
+         <property name="icon">
+          <iconset resource="utiles.qrc">
+           <normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/green_button.png</normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/green_button.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Desconectar">
+         <property name="text">
+          <string>Desconectar</string>
+         </property>
+         <property name="icon">
+          <iconset resource="utiles.qrc">
+           <normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/red_button.jpeg</normaloff>:/home/hipotec/Dokumente/Proyecto CERF/Codigo/GUI/Ventanas/red_button.jpeg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_IP">
+         <property name="text">
+          <string>IP :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="LEditIP">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>200</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuArchivo">
+    <property name="title">
+     <string>Archivo</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="Menu_actionSalir"/>
+   </widget>
+   <widget class="QMenu" name="menuAyuda">
+    <property name="title">
+     <string>Ayuda</string>
+    </property>
+    <addaction name="actionAcetca_de"/>
+   </widget>
+   <addaction name="menuArchivo"/>
+   <addaction name="menuAyuda"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="Menu_actionSalir">
+   <property name="text">
+    <string>Salir</string>
+   </property>
+  </action>
+  <action name="actionAcetca_de">
+   <property name="text">
+    <string>Acetca de ...</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>Btn_Conectar</tabstop>
+  <tabstop>LEditIP</tabstop>
+  <tabstop>Btn_VerRaspcam</tabstop>
+  <tabstop>Btn_Agregar_Usr</tabstop>
+  <tabstop>Btn_Cofiguracion</tabstop>
+  <tabstop>Btn_Quitar_Usr</tabstop>
+ </tabstops>
+ <resources>
+  <include location="utiles.qrc"/>
+ </resources>
+ <connections/>
+</ui>

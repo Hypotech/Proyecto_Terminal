@@ -22,7 +22,8 @@ bool DectorRostros::clasificadorCargado()
 
 }
 
-void DectorRostros::EscanearImagen(const Mat& ImagenEntrada, vector<Rect>& UbicacionRostros) 
+void DectorRostros::EscanearImagen(const Mat& ImagenEntrada, vector<Rect>& UbicacionRostros,
+                                   const int minEscala)
 {
     Mat ImagenByN;
     // int width  = ImagenEntrada.size().width, height = ImagenEntrada.size().height;
@@ -40,5 +41,5 @@ void DectorRostros::EscanearImagen(const Mat& ImagenEntrada, vector<Rect>& Ubica
 					 //|CV_HAAR_DO_ROUGH_SEARCH
 					 //|CV_HAAR_SCALE_IMAGE
 					 ,
-					 Size(200, 200) ); // Escala, Vecinos, 0, minScaleSize, maxScaleSize); 
+                     Size(minEscala, minEscala) ); // Escala, Vecinos, 0, minScaleSize, maxScaleSize);
 }
