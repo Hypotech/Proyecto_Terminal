@@ -1,0 +1,8 @@
+minimoDetectar=100
+NumEigen=8
+rangoCofianza=100.0
+radio=1
+celdaX=8
+celdaY=8
+modelo=LBPH
+r

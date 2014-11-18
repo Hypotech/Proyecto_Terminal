@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Cofiguración</string>
   </property>
   <widget class="QGroupBox" name="gBox_Metodos">
    <property name="geometry">

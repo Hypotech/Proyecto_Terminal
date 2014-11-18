@@ -15,6 +15,10 @@
 #include <qstring.h>
 #include <ventana_config.h>
 #include <ventanaquitar.h>
+#include <QFile>
+#include <QRegExpValidator>
+#include <QRegExp>
+#include "agregar_usur_finalizar.h"
 
 namespace Ui {
 class VentanaPrincipal;
@@ -30,7 +34,7 @@ public:
 
 signals:
     void FrameListo();
-    void RaspicamLista(cv::Mat&);
+    void RaspicamLista(const cv::Mat&);
     void RostroDectado(cv::Mat&);
     void RostroNODectado();
 
@@ -51,14 +55,14 @@ private slots:
 private:
     Ui::VentanaPrincipal *ui;
     QVector<QRgb> TablaDColores;
-    QRegExp validorIP;
-    Camara* camLap;
+    QRegExp iPRegEx;
     ReceptorDeImagen Servidor;
     DectorRostros DectorRostrosServidor;
     ReconocerdordePersona* ReconocedorServidor;
-    ventana_config::tamanyo minRostro = ventana_config::_200, Neigen = 8;
+    ventana_config::tamanyo minRostro = ventana_config::_200;
     float rangoConfianza = 100.0;
-    int radio = 1, regX = 8, regY = 8, vecinos = 8; metodo modelo = LBPH;
+    int Neigen = 8, radio = 1, regX = 8, regY = 8/*, vecinos = 8*/;
+    ReconocerdordePersona::metodo modelo = ReconocerdordePersona::LBPH;
     QTimer *Timer;
 
     cv::Mat FrameRecibido;

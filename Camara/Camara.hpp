@@ -12,7 +12,7 @@ class Camara
 {
 public:
     Camara(int IndiceCamara = 0);
-    ~Camara();
+//    ~Camara();
 
     bool GetFrame(Mat&);
 

@@ -28,14 +28,13 @@ int main(int argc, char *argv[])
 
     ReceptorDeImagen Servidor;
     DectorRostros DectorServidor;
-    ReconocerdordePersona ReconocedorServidor(Neigen,rangoConfianza,radio,regX,regY);
+    ReconocerdordePersona ReconocedorServidor(Neigen,rangoConfianza,radio,regX,regY,metodo modelo = LBPH);
     // ReconocerdordePersona ReconocedorServidor(atoi(argv[3]),atof(argv[4]), atoi(argv[5]), atoi(argv[6]), atoi(argv[7]));
 
     Mat ImgRecibida;
     vector<Rect> MarcosRostros;
     Scalar colorTexto(AZUL); //representa el color azul en BGR
     int Respuesta= -9;
-    int DescripDeConexEmisor;
 
     if ( DectorServidor.clasificadorCargado() == false )
 	{
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
 	    return -1;
 	}
 
-    if( (DescripDeConexEmisor= Servidor.EsperarConexion() ) < 0) //esperamos a que la raspberry se conecte
+    if( Servidor.conectar() ) //esperamos a que la raspberry se conecte
 	{
 	    cout << "**Error al intentar esperar la conexion\nSaliendo de la aplicacion..." << endl;
 	    return -2;
@@ -97,7 +96,7 @@ int main(int argc, char *argv[])
 	    else{
 		std::cout << "Se cerro la comunicacion" << std::endl;
 		Servidor.cerrarConexion();
-		Servidor.EsperarConexion();
+		Servidor.conectar();
 		continue;
 	    }
 	}

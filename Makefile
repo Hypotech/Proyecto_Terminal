@@ -3,11 +3,12 @@
 
 CFLAGS = -std=gnu++11 `pkg-config --cflags opencv`
 LIBS = `pkg-config --libs opencv`
-
+HOME = home/hipotec/
 OBJECTS = Main_Prueba_Detector.o Camara.o RostrosDector.o
 SOURCES = Main_Prueba.cpp Camara/Camara.cpp Deteccion_Facial/RostrosDector.cpp\
-	 Reconocimiento_Facial/ReconocerPersona.cpp Comunicacion/Receptor/ReceptorDeImag.cpp
+	 Reconocimiento_Facial/ReconocerPersona.cpp Comunicacion/Receptor/ReceptorDeImag.cpp\
+	 manejoArchivos/manejoarchivos.cpp
 
 detector_de_Rostros: 
-	g++ $(CFLAGS) $(SOURCES) -o Reconoce $(LIBS)
+	g++ $(CFLAGS) $(SOURCES) -o Reconoce $(LIBS) -I./manejoArchivos/
 

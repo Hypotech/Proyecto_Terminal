@@ -3,6 +3,11 @@
 
 #include <QDialog>
 #include <QMessageBox>
+#include <QFile>
+#include <ReconocerPersona.hpp>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 namespace Ui {
 class ventana_config;
@@ -13,9 +18,9 @@ class ventana_config : public QDialog
     Q_OBJECT
 
 public:
-    enum metodo {eigen,fisher, LBPH};
     enum tamanyo {_200,_150,_100};
-    explicit ventana_config( QWidget *parent = 0 ,metodo metdo= LBPH, tamanyo tam = _200);
+    explicit ventana_config(ReconocerdordePersona::metodo metdo = ReconocerdordePersona::LBPH,
+                             tamanyo tam = _200, QWidget *parent = 0 );
     ~ventana_config();
 
 private slots:
@@ -24,6 +29,9 @@ private slots:
 
 private:
     Ui::ventana_config *ui;
+    QString modeloRecon;
+    int minRostro;
+    bool GuardarConfig();
 };
 
 #endif // VENTANA_CONFIG_H

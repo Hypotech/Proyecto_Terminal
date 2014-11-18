@@ -10,15 +10,30 @@ using namespace cv;
 using namespace std;
 
 ReconocerdordePersona::ReconocerdordePersona(int Neigen, double ranConfia, int radio,
-                                             int regX, int regY, int vecinos, metodo modelo)
-    : Ruta_a_CSV(FILE_CSV)
+                                             int regX, int regY, metodo modelo)
+{
+    vector <Mat> imagenes;
+    vector<int> etiquetas;
+
+    cout << "Inicializando Reconocedor de rostros...";
+
+    obtenerParametrosCSV(FILE_CSV,imagenes, etiquetas);
+    cambiarModelo (Neigen, ranConfia, radio, regX, regY, modelo);
+
+    cout<<"Entrenando...";
+    Reconocedor->train(imagenes,etiquetas);
+
+    cout << "(Listo)"<< endl;
+}
+ReconocerdordePersona::ReconocerdordePersona(std::string ruta, int Neigen, double ranConfia, int radio,
+                                             int regX, int regY, metodo modelo)
 {
     vector <Mat> imagenes;
     vector<int> etiquetas;
 
     cout << "Inicializando Reconocedor de rostros... "<< endl;
 
-    obtenerParametrosCSV(Ruta_a_CSV,imagenes, etiquetas);
+    obtenerParametrosDirectorio(ruta,imagenes,etiquetas);
     cambiarModelo (Neigen, ranConfia, radio, regX, regY, modelo);
 
     cout<<"Entrenando..."<<endl;
@@ -39,7 +54,8 @@ int ReconocerdordePersona::consulatarBD(Mat& ImagenRostro, double& confianza) co
     return label;
 }
 
-void ReconocerdordePersona::obtenerParametrosCSV(const string& ArchivoCSV, vector<Mat>& imagenes, vector <int>& etiquetas)
+void ReconocerdordePersona::obtenerParametrosCSV(const string& ArchivoCSV,
+                                                 vector<Mat>& imagenes, vector <int>& etiquetas)
 {
     std::ifstream file(ArchivoCSV.c_str(), ifstream::in);
 
@@ -69,7 +85,7 @@ void ReconocerdordePersona::obtenerParametrosCSV(const string& ArchivoCSV, vecto
 }
 
 void ReconocerdordePersona::cambiarModelo(int Neigen, double ranConfia, int radio, int regX,
-                                          int regY, int vecinos, metodo modelo)
+                                          int regY, metodo modelo)
 {
     if (modelo == LBPH)
         Reconocedor = createLBPHFaceRecognizer(radio,Neigen,regX, regY,ranConfia);
@@ -77,4 +93,45 @@ void ReconocerdordePersona::cambiarModelo(int Neigen, double ranConfia, int radi
         Reconocedor = createFisherFaceRecognizer(Neigen,ranConfia);
     else
         Reconocedor = createEigenFaceRecognizer(Neigen,ranConfia);
+}
+
+void ReconocerdordePersona::obtenerParametrosDirectorio(const string &ruta,
+                                                        vector<Mat> &imagenes, vector<int> &etiquetas)
+{
+    manejoArchivos adminArchivos;
+    std::vector<std::string> listaCarpetas;
+
+    listaCarpetas = adminArchivos.listarCarpeta(ruta);
+
+    if (listaCarpetas.empty())
+        return;
+
+    std::string rutaImagenes = ruta;
+
+    if( ruta.compare(ruta.length()-1, 1, "/") != 0 )
+        rutaImagenes.append("/");
+
+    std::cout << "Lista de carpetas: "<< std::endl;
+
+    for(std::vector<std::string>::const_iterator i = listaCarpetas.begin();
+        i != listaCarpetas.end(); i++)
+    {
+        std::cout << *i << std::endl;
+
+        std::vector<std::string> listaImagenes;
+
+        listaImagenes = adminArchivos.listarArchivos(rutaImagenes + *i);
+
+        if(listaImagenes.empty())
+            continue;
+
+        for(std::vector<std::string>::const_iterator j = listaImagenes.begin();
+            j != listaImagenes.end(); j++)
+        {
+            std::cout << rutaImagenes << *i << "/" << *j << std::endl;
+
+            imagenes.push_back( imread(rutaImagenes +  *i + "/" + *j, 0) );
+            etiquetas.push_back( std::stoi(i->substr(1)) );
+        }
+    }
 }

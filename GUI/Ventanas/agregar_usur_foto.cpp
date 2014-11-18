@@ -14,6 +14,8 @@ agregar_usur_Foto::agregar_usur_Foto(QWidget *parent) :
     modelo = new QStandardItemModel;
     ui->lview_Capturas->setModel(modelo);
 
+    camaraLocal = new Camara(0);
+
     NumDeFotos = 0;
 
     QCamera camara;
@@ -22,12 +24,19 @@ agregar_usur_Foto::agregar_usur_Foto(QWidget *parent) :
         QString NombreCamara = camara.deviceDescription(NumeroCamara);
         ui->comBox_CamarasList->addItem(NombreCamara);
     }
+    
+    Temporizador = new QTimer();
 
-    connect(Temporizador,SIGNAL(timeout()),SLOT(SL_Desplegar_camaraLocal));
-    connect( ui->comBox_CamarasList,SIGNAL( currentIndexChanged(int) ),SLOT( SL_cambiarDeCamara(int) ) );//seleccion de camara
+    connect( Temporizador, SIGNAL( timeout() ), this, SLOT( SL_Procesar_camaraLocal() ) );
+    connect( ui->comBox_CamarasList,SIGNAL( currentIndexChanged(int) ),this,
+             SLOT( SL_cambiarDeCamara(int) ) );//seleccion de camara
     connect( this,SIGNAL(CambioValorNumDeFotos()),SLOT( SL_Inhabilitar_Botones() ) ); //sólo necesarias 8 fotos
-    connect( ui->lview_Capturas->selectionModel(),SIGNAL( selectionChanged (QItemSelection,QItemSelection) ),
+    connect( ui->lview_Capturas->selectionModel(),
+             SIGNAL( selectionChanged (QItemSelection,QItemSelection) ),
             this, SLOT( SL_Habilitar_Btn_EliminarFoto(QItemSelection) ) );
+
+    for (int i=0; i<256; i++)
+        TablaDColores.push_back(qRgb(i,i,i));
 
     SL_cambiarDeCamara(0); //raspicam
 
@@ -36,19 +45,23 @@ agregar_usur_Foto::agregar_usur_Foto(QWidget *parent) :
 agregar_usur_Foto::~agregar_usur_Foto()
 {
     delete ui;
-    delete camaraLocal;
     delete Temporizador;
+    if (camaraLocal != NULL){
+        delete camaraLocal;
+    }
     delete modelo;
 }
 
 void agregar_usur_Foto::on_Btn_TomarFoto_clicked()
 {
     NumDeFotos++;
-    foto.push_back(RostroDetectado);
+    fotos.push_back(RostroDetectado);
 
-    QPixmap Pixtemporal = convertir_Mat_a_Pixmap(RostroDetectado);
-    QStandardItem* nuevaFoto = new QStandardItem( QIcon(Pixtemporal), QString::number(NumDeFotos) );
-    capturas.push_back(nuevaFoto);
+    if(RostroDetectado.empty())
+        std::cout<< "rostroDetectado vacio"<< std::endl;
+
+    QPixmap* Pixtemporal = new QPixmap(convertir_Mat_a_Pixmap(fotos.last()));
+    QStandardItem* nuevaFoto = new QStandardItem( QIcon(*Pixtemporal), QString::number(NumDeFotos) );
 
     modelo->appendRow(nuevaFoto);
     ui->lview_Capturas->scrollToBottom(); //scroll hasta el ultima captura
@@ -58,17 +71,18 @@ void agregar_usur_Foto::on_Btn_TomarFoto_clicked()
 
 bool agregar_usur_Foto::SL_cambiarDeCamara(int IndiceComboBox)
 {
-    delete camaraLocal;
 
     if(IndiceComboBox == 0){
         Temporizador->stop(); //detiene el timer
-        connect( this, SIGNAL(RaspicamLista(cv::Mat&)),SLOT(SL_Desplegar_Raspicam(cv::Mat&)) );
+        connect( this, SIGNAL(RaspicamLista(const cv::Mat&)),SLOT(SL_Desplegar_Raspicam(const cv::Mat&)) );
         connect(this, SIGNAL(RaspicamRostroDectado(cv::Mat&)),SLOT(SL_RostroDetectado(cv::Mat&)) );
         connect(this,SIGNAL(RaspicamRostroNODectado()),SLOT(SL_RostroNODetectado()));
         return true;
     }
     else if(IndiceComboBox > 0){
-        disconnect(this, SIGNAL(RaspicamLista(cv::Mat&)),this,SLOT(SL_Desplegar_Raspicam(cv::Mat&)) );
+        Temporizador->stop();
+        delete camaraLocal;
+        disconnect(this, SIGNAL(RaspicamLista(const cv::Mat&)),this,SLOT(SL_Desplegar_Raspicam(const cv::Mat&)) );
         disconnect(this, SIGNAL(RaspicamRostroDectado(cv::Mat&)), this,SLOT(SL_RostroDetectado(cv::Mat&)) );
         disconnect(this,SIGNAL(RaspicamRostroNODectado()),this,SLOT(SL_RostroNODetectado()));
         camaraLocal = new Camara(IndiceComboBox-1);// abrimos la camara con el id especificado
@@ -79,16 +93,35 @@ bool agregar_usur_Foto::SL_cambiarDeCamara(int IndiceComboBox)
     return false;
 }
 
-void agregar_usur_Foto::SL_Desplegar_camaraLocal()
+void agregar_usur_Foto::SL_Procesar_camaraLocal()
 {
-    cv::Mat Imagen;
+    cv::Mat imagenCam;
+    cv::Mat imagenBN;
 
-    camaraLocal->GetFrame(Imagen);//lee un cuadro desde la camara
+    std::vector<cv::Rect> coorUbicacion;
 
-    ui->lbl_ImageDisplay->setPixmap( convertir_Mat_a_Pixmap(Imagen) );
+    camaraLocal->GetFrame(imagenCam);//lee un cuadro desde la camara
+    cvtColor(imagenCam,imagenBN,CV_BGR2GRAY);//convertir a ByN
+    DetectorCamLocal.EscanearImagen(imagenBN, coorUbicacion,200);//buscamos un rostro
+
+    if(coorUbicacion.empty()){//ningun rostro detectado
+        SL_RostroNODetectado();
+        ui->lbl_ImageDisplay->setPixmap( convertir_Mat_a_Pixmap(imagenCam) ); //se despliega
+        return;
+    }
+
+    cv::Mat ImagenRostro = imagenCam(coorUbicacion.front()); //recortamos solo el rostro y lo almacenamos
+    rectangle(imagenCam, coorUbicacion.front(), cv::Scalar(255,255,255)); //se dibuja un rectangulo que enmarca el rostro detectado
+
+    cv::cvtColor(ImagenRostro,ImagenRostro,CV_BGR2GRAY);
+    cv::Mat RostroNormalizado(300, 300 ,ImagenRostro.type() ); //aqui se almacenara el rostro ya normalizada en tamanyo
+
+    ui->lbl_ImageDisplay->setPixmap( convertir_Mat_a_Pixmap(imagenCam) ); //se despliega
+    cv::resize(ImagenRostro, RostroNormalizado, RostroNormalizado.size(), 0, 0, INTER_LINEAR); //normalizamos la imagen en tamanyo
+    SL_RostroDetectado(RostroNormalizado);//mandamos hacia el slot
 }
 
-void agregar_usur_Foto::SL_Desplegar_Raspicam(Mat& Imagen)
+void agregar_usur_Foto::SL_Desplegar_Raspicam(const Mat &Imagen)
 {
     ui->lbl_ImageDisplay->setPixmap( convertir_Mat_a_Pixmap(Imagen) );
 }
@@ -110,7 +143,7 @@ void agregar_usur_Foto::SL_Inhabilitar_Botones()
         ui->Btn_Eliminar->setEnabled(true);
 }
 
-QPixmap agregar_usur_Foto::convertir_Mat_a_Pixmap(Mat& ImagenEntrada)
+QPixmap agregar_usur_Foto::convertir_Mat_a_Pixmap(const Mat& ImagenEntrada)
 {
     if(ImagenEntrada.type()==CV_8UC1)
     {
@@ -143,11 +176,9 @@ QPixmap agregar_usur_Foto::convertir_Mat_a_Pixmap(Mat& ImagenEntrada)
 void agregar_usur_Foto::on_Btn_Eliminar_clicked()
 {
     int ElemenSelec = ui->lview_Capturas->currentIndex().row();
-    modelo->takeItem(ElemenSelec); //lo quita de la ListView
-    QStandardItem* ElemenEliminar = capturas.takeAt(ElemenSelec);
-    delete ElemenEliminar; //retorna la memoria ocupada
+    ui->lview_Capturas->model()->removeRow(ElemenSelec);
 
-    foto.takeAt(ElemenSelec);
+    fotos.takeAt(ElemenSelec);
     --NumDeFotos;
     emit CambioValorNumDeFotos();
 }
@@ -157,13 +188,18 @@ void agregar_usur_Foto::SL_Habilitar_Btn_EliminarFoto(QItemSelection)
     ui->Btn_Eliminar->setEnabled(true);
 }
 
-void agregar_usur_Foto::SL_RostroDetectado(Mat& Rostro)
+void agregar_usur_Foto::SL_RostroDetectado(cv::Mat& Rostro)
 {
-    RostroDetectado = Rostro;
-    ui->Btn_TomarFoto->setEnabled(true);
+    RostroDetectado = Rostro.clone();
+    SL_Inhabilitar_Botones();
 }
 
 void agregar_usur_Foto::SL_RostroNODetectado()
 {
     ui->Btn_TomarFoto->setEnabled(false);
+}
+
+void agregar_usur_Foto::on_Btn_Continuar_clicked()
+{
+    accept();
 }

@@ -62,7 +62,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Presione el botón continuar y siga los pasos correspondientes  para agregar un usuario al sistema de reconocimiento facial de la cerradura electrónica. Presione en el botón cancelar para regresar inmediatamente a la ventana principal, sin hacer ninguna modificación.</string>
+    <string>Siga los pasos que le suguiere el asistente,  para agregar un usuario al sistema de reconocimiento facial. Presione en el botón cancelar para regresar inmediatamente a la ventana principal, sin hacer ninguna modificación.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignJustify|Qt::AlignTop</set>

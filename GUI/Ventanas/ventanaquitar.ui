@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Quitar usuario</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="Btn_Eliminar">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>410</y>
+     <x>500</x>
+     <y>220</y>
      <width>80</width>
      <height>23</height>
     </rect>
@@ -39,12 +39,12 @@
     <string>Eliminar</string>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
+  <widget class="QListView" name="lv_displayUsuarios">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>70</y>
-     <width>591</width>
+     <width>461</width>
      <height>321</height>
     </rect>
    </property>

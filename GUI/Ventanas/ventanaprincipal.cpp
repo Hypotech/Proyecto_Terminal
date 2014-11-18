@@ -6,12 +6,16 @@
 VentanaPrincipal::VentanaPrincipal(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::VentanaPrincipal),
-    validorIP("((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.)){3}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)($))")
+    iPRegEx("((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.)){3}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)($))")
 {
     ui->setupUi(this);
     this->setFixedSize(800,600);
     ui->Btn_Desconectar->hide();
-    ui->statusbar->showMessage("Desconectado");
+    ui->statusBar->showMessage("Desconectado");
+
+    QRegExpValidator* validadorIP = new QRegExpValidator(iPRegEx,this);
+    ui->LEditIP->setValidator(validadorIP);
+//    ui->LEditIP->setInputMask("000.000.000.000; ");
 
     const int PeriodoCaptura = 1000/25;   //ms correspondientes para obtener 25 fps
     Timer = new QTimer(this);
@@ -32,24 +36,24 @@ VentanaPrincipal::VentanaPrincipal(QWidget *parent) :
     if( LeerArchivoConfig() == false){
         QMessageBox MnsjNoParametros;
         MnsjNoParametros.setIcon(QMessageBox::Critical);
-        MnsjNoParametros.setText("Error: Archivo Parametros.conf no encontrado");
+        MnsjNoParametros.setText("Error: Archivo \"configuracion\" no encontrado");
+        MnsjNoParametros.exec();
     }
 
-    ReconocedorServidor = new ReconocerdordePersona(Neigen,rangoConfianza,
-                                                    radio,regX,regY,vecinos,modelo);
+    ReconocedorServidor = new ReconocerdordePersona("./BD", Neigen,rangoConfianza,
+                                                    radio,regX,regY,modelo);
 }
 
 VentanaPrincipal::~VentanaPrincipal()
 {
-    delete ui;
-    delete camLap;
     delete Timer;
     delete ReconocedorServidor;
+    delete ui;
 }
 
 bool VentanaPrincipal::LeerArchivoConfig()
 {
-    QFile archivo ("config");
+    QFile archivo ("configuracion");
     QStringList parametros, valores;
 
     if( archivo.open(QIODevice::ReadOnly| QIODevice::Text) )
@@ -66,12 +70,25 @@ bool VentanaPrincipal::LeerArchivoConfig()
             }
         }
     }
-    else
+    else{
+        archivo.close();
         return false;
+    }
 
     for(int i=0; i < parametros.length(); i++){
-        if(parametros[i] == "minimoDetectar")
-            minRostro = valores[i].toInt();
+        if(parametros[i] == "minimoDetectar"){
+            switch (valores[i].toInt()){
+            case 200:
+                minRostro = ventana_config::_200;
+                break;
+            case 150:
+                minRostro = ventana_config::_150;
+                break;
+            case 100:
+                minRostro = ventana_config::_100;
+                break;
+            }
+        }
         else if(parametros[i] == "NumEigen")
             Neigen = valores[i].toInt();
         else if(parametros[i] == "rangoCofianza")
@@ -82,17 +99,19 @@ bool VentanaPrincipal::LeerArchivoConfig()
             regX = valores[i].toInt();
         else if(parametros[i] == "celdaY")
             regY = valores[i].toInt();
-        else if(parametros[i] == "vecinos")
-            vecinos = valores[i].toInt();
+//        else if(parametros[i] == "vecinos")
+//            vecinos = valores[i].toInt();
         else if(parametros[i] == "modelo"){
             if (valores[i] == "eigen")
-                modelo = eigen;
+                modelo = ReconocerdordePersona::eigen;
             else if (valores[i] == "fisher")
-                modelo = fisher;
+                modelo = ReconocerdordePersona::fisher;
             else if (valores[i] == "LBPH")
-                modelo = LBPH;
+                modelo = ReconocerdordePersona::LBPH;
         }
     }
+
+    archivo.close();
     return true;
 }
 
@@ -112,15 +131,31 @@ void VentanaPrincipal::SL_ReconocerRostros()
 {
     vector<Rect> MarcosRostrosDetec;
     int Respuesta = NO;
-    DectorRostrosServidor.EscanearImagen(FrameRecibido, MarcosRostrosDetec,minRostro);
+
+    int tamRostroDeteccion;
+
+    switch (minRostro ) {
+    case ventana_config::_100:
+        tamRostroDeteccion = 100;
+        break;
+    case ventana_config::_150:
+        tamRostroDeteccion = 150;
+        break;
+      default:
+        tamRostroDeteccion = 200;
+        break;
+    }
+
+    DectorRostrosServidor.EscanearImagen(FrameRecibido, MarcosRostrosDetec,tamRostroDeteccion);
 
     cv::Mat ImagenRostro;
 
-    for (vector<Rect>::const_iterator Rostro = MarcosRostrosDetec.begin() ; Rostro != MarcosRostrosDetec.end() ; Rostro++){
+    for (vector<Rect>::const_iterator Rostro = MarcosRostrosDetec.begin() ;
+         Rostro != MarcosRostrosDetec.end() ; Rostro++){
 
         rectangle(FrameRecibido, *Rostro, cv::Scalar(255,255,255)); //se dibuja un rectangulo que enmarca el rostro detectado
         ImagenRostro = FrameRecibido(*Rostro); //recortamos solo el rostro y lo almacenamos
-        cv::Mat RostroNormalizado(anchImag, altImag ,ImagenRostro.type() ); //aqui se almacenara el rostro ya normalizada en tamanyo
+        cv::Mat RostroNormalizado(300, 300 ,ImagenRostro.type() ); //aqui se almacenara el rostro ya normalizada en tamanyo
 
         double confianza;
         cv::resize(ImagenRostro, RostroNormalizado, RostroNormalizado.size(), 0, 0, INTER_LINEAR); //normalizamos la imagen en tamanyo
@@ -135,6 +170,7 @@ void VentanaPrincipal::SL_ReconocerRostros()
         else{
             putText(FrameRecibido,format("Subjeto ID %d", IDpersona),P ,FONT_HERSHEY_PLAIN, ESCALA_TEXTO, cv::Scalar(255,255,255));
             Respuesta = SI;
+            std::cout<< "Rostro encontrado, persona con ID: " << IDpersona << std::endl;
         }
     }
     Servidor.MandarApertura(Respuesta); //mandamos a la raspberry apertura si o no
@@ -154,36 +190,41 @@ void VentanaPrincipal::on_Menu_actionSalir_triggered()
 
 void VentanaPrincipal::on_Btn_VerRaspcam_clicked()
 {
-    ver_raspicam ventanaVerRaspicam(this);
+    ver_raspicam ventanaVerRaspicam;
 
-    connect( this,SIGNAL( RaspicamLista(cv::Mat&) ),&ventanaVerRaspicam,SLOT( DesplegarFrame(cv::Mat&) ) );
-    connect(&ventanaVerRaspicam,SIGNAL(abrirPuerta(), this,SLOT(SL_abrirPuerta());
-    ventanaVerRaspicam.setModal(false);
-    this->hide();
+    connect( this,SIGNAL( RaspicamLista(const cv::Mat&) ),&ventanaVerRaspicam,SLOT( DesplegarFrame(const cv::Mat&) ) );
+    connect( &ventanaVerRaspicam,SIGNAL(abrirPuerta()), this,SLOT(SL_abrirPuerta()) );
+    this->setEnabled(false);
     ventanaVerRaspicam.exec();
-    this->setVisible(true);
+    this->setEnabled(true);
 }
 
 void VentanaPrincipal::on_Btn_Agregar_Usr_clicked()
 {
     Agregar_Usuario ventanaAgregarUsuario;
-    ventanaAgregarUsuario.setModal(false);
-    this->hide();
+    this->setEnabled(false);
 
     if(ventanaAgregarUsuario.exec() == QDialog::Accepted){
-        agregar_usur_Foto ventanaAgregarUsrFoto(this);
-        ventanaAgregarUsrFoto.setModal(false);
+        agregar_usur_Foto ventanaAgregarUsrFoto;
+//        ventanaAgregarUsrFoto.setModal(false);
 
-        connect( this,SIGNAL( RaspicamLista(cv::Mat&) ),&ventanaAgregarUsrFoto, SIGNAL(RaspicamLista(cv::Mat&) ) );
-        connect( this,SIGNAL( RostroDectado(cv::Mat&) ), &ventanaAgregarUsrFoto, SIGNAL( RaspicamRostroDectado(cv::Mat&) ) );
-        connect( this,SIGNAL( RostroNODectado() ), &ventanaAgregarUsrFoto, SIGNAL( RaspicamRostroNODectado() ) );
+        connect( this,SIGNAL( RaspicamLista(const cv::Mat&) ),&ventanaAgregarUsrFoto,
+                 SIGNAL(RaspicamLista(const cv::Mat&) ) );
 
-        if(ventanaAgregarUsrFoto.exec() == QDialog::Accepted){
-            //Ventana de procesado
+        connect( this,SIGNAL( RostroDectado(cv::Mat&) ), &ventanaAgregarUsrFoto,
+                 SIGNAL( RaspicamRostroDectado(cv::Mat&) ) );
+
+        connect( this,SIGNAL( RostroNODectado() ), &ventanaAgregarUsrFoto,
+                 SIGNAL( RaspicamRostroNODectado() ) );
+
+        if (ventanaAgregarUsrFoto.exec() == QDialog::Accepted){
+            agregar_usur_finalizar ventanaFinalizar(ventanaAgregarUsrFoto.fotos);
+
+            ventanaFinalizar.exec();
         }
     }
 
-    this->setVisible(true);
+    this->setEnabled(true);
 
 }
 
@@ -201,7 +242,7 @@ void VentanaPrincipal::on_Btn_Conectar_clicked()
         Timer->start(); /*empieza a correr el timer*/
         ui->Btn_Conectar->hide(); //oculta el boton de conectar
         ui->Btn_Desconectar->setVisible(true);
-        ui->statusbar->showMessage( "Conectado a " + ui->LEditIP->text() );
+        ui->statusBar->showMessage( "Conectado a " + ui->LEditIP->text() );
         ui->LEditIP->setEnabled(false);
 
         ui->Btn_Agregar_Usr->setEnabled(true);
@@ -213,7 +254,7 @@ void VentanaPrincipal::on_Btn_Conectar_clicked()
 
 void VentanaPrincipal::on_LEditIP_textEdited(const QString &str) //habilita el boton de conectar
 {
-    if( validorIP.exactMatch(str) )
+    if( ui->LEditIP->hasAcceptableInput() )
         ui->Btn_Conectar->setEnabled(true);
     else
         ui->Btn_Conectar->setEnabled(false);
@@ -223,11 +264,11 @@ void VentanaPrincipal::on_Btn_Desconectar_clicked()
 {
     Timer->stop(); /* Se detiene el Timer */
     Servidor.cerrarConexion();
-    disconnect( this, SIGNAL( FrameListo() ),this,SLOT( SL_ReconocerRostros() ) );
+//    disconnect( this, SIGNAL( FrameListo() ),this,SLOT( SL_ReconocerRostros() ) );
     ui->Btn_Desconectar->hide();
     ui->Btn_Conectar->setVisible(true);
     ui->LEditIP->setEnabled(true);
-    ui->statusbar->showMessage("Desconectado");
+    ui->statusBar->showMessage("Desconectado");
 
     ui->Btn_Agregar_Usr->setEnabled(false);
     ui->Btn_Cofiguracion->setEnabled(false);
@@ -237,29 +278,27 @@ void VentanaPrincipal::on_Btn_Desconectar_clicked()
 
 void VentanaPrincipal::on_Btn_Cofiguracion_clicked()
 {
-    ventana_config ventanaConfig ( this, modelo, minRostro);
-    ventanaConfig.setModal(false);
-    this->setVisible(false);
+    ventana_config ventanaConfig (modelo, minRostro);
+    this->setEnabled(false);
     ventanaConfig.exec();
-    this->setVisible(true);
+    this->setEnabled(true);
 }
 
 void VentanaPrincipal::on_Btn_Quitar_Usr_clicked()
 {
     ventanaQuitar ventanaQuit;
-    ventanaQuit.setModal(false);
-    this->setVisible(false);
+    this->setEnabled(false);
     ventanaQuit.exec();
-    this->setVisible(false);
+    this->setEnabled(true);
 }
 
 void VentanaPrincipal::on_LEditIP_returnPressed()
 {
-    if( ui->Btn_Conectar->isEnabled() )
         on_Btn_Conectar_clicked();
 }
 
 void VentanaPrincipal::SL_abrirPuerta()
 {
-    Servidor.MandarApertura(SI);
+    int respuesta = SI;
+    Servidor.MandarApertura(respuesta);
 }

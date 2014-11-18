@@ -15,7 +15,6 @@ public:
     ReceptorDeImagen(const char* const IP);
     ~ReceptorDeImagen();
     bool Recibir(cv::Mat &);
-    int EsperarConexion();
     void MandarApertura(int& ResulReconocimiento) const;
     void cerrarConexion();
     bool conectar(const char* const IP); //conectar con la IP especificada

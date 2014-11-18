@@ -16,7 +16,7 @@ ver_raspicam::~ver_raspicam()
     delete ui;
 }
 
-void ver_raspicam::DesplegarFrame(cv::Mat& Frame)
+void ver_raspicam::DesplegarFrame(const cv::Mat &Frame)
 {
     if(Frame.type()==CV_8UC1)
     {
@@ -42,7 +42,6 @@ void ver_raspicam::DesplegarFrame(cv::Mat& Frame)
 
         imagenQT = imagenQT.rgbSwapped();
         ui->lbl_ImagenVideo->setPixmap(QPixmap::fromImage(imagenQT));
-//        return QPixmap::fromImage(imagenQT);
     }
 }
 

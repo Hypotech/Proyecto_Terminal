@@ -5,10 +5,10 @@ Camara::Camara(int IndiceCamara): FlujoVideo(IndiceCamara)
 
 }
 
- Camara::~Camara()
-{
-    FlujoVideo.release();
-}
+//Camara::~Camara()
+//{
+//    FlujoVideo.release();
+//}
 
 bool Camara::GetFrame(Mat& Almacen)
 {
