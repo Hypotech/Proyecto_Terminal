@@ -18,10 +18,6 @@ public:
 private:
     CascadeClassifier Detector_en_Cascada;
 
-    // double Escala;
-    // double minimoTamanyo; //tamanyo minimo posible a detectar de los rostros 
-    // double maximoTamnyo; //tamnyo maximo posible a detectar de los rostros
-    // int Vecinos;
 };
 
 

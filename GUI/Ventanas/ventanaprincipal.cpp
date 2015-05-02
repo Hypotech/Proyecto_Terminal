@@ -15,7 +15,6 @@ VentanaPrincipal::VentanaPrincipal(QWidget *parent) :
 
     QRegExpValidator* validadorIP = new QRegExpValidator(iPRegEx,this);
     ui->LEditIP->setValidator(validadorIP);
-//    ui->LEditIP->setInputMask("000.000.000.000; ");
 
     const int PeriodoCaptura = 1000/25;   //ms correspondientes para obtener 25 fps
     Timer = new QTimer(this);
@@ -40,7 +39,14 @@ VentanaPrincipal::VentanaPrincipal(QWidget *parent) :
         MnsjNoParametros.exec();
     }
 
-    ReconocedorServidor = new ReconocerdordePersona("./BD", Neigen,rangoConfianza,
+    if (manejoArchivos::listarCarpeta("./BD").empty()){
+        QMessageBox::warning(this,"Sin usuarios que detectar",
+                             "No hay ningun usuario en la BD, intente agregar uno primero",
+                             QMessageBox::Ok);
+        ui->Btn_Agregar_Usr->setEnabled(true);
+    }
+    else
+        ReconocedorServidor = new ReconocerdordePersona("./BD", Neigen,DBL_MAX,
                                                     radio,regX,regY,modelo);
 }
 
@@ -99,8 +105,6 @@ bool VentanaPrincipal::LeerArchivoConfig()
             regX = valores[i].toInt();
         else if(parametros[i] == "celdaY")
             regY = valores[i].toInt();
-//        else if(parametros[i] == "vecinos")
-//            vecinos = valores[i].toInt();
         else if(parametros[i] == "modelo"){
             if (valores[i] == "eigen")
                 modelo = ReconocerdordePersona::eigen;
@@ -163,7 +167,7 @@ void VentanaPrincipal::SL_ReconocerRostros()
 
         Point P(Rostro->x, Rostro->y); //obtenemos la coordenada inicial del rectangulo que enmarca el rostro (esquina superior izquierda)
 
-        if(IDpersona == -1 || confianza < RangoConfianza){
+        if(IDpersona == -1 /*|| confianza < rangoConfianza*/){
             putText(FrameRecibido,"Rostro desconocido" ,P ,FONT_HERSHEY_PLAIN, ESCALA_TEXTO, cv::Scalar(255,255,255));
             Respuesta = NO;
         }
@@ -206,7 +210,6 @@ void VentanaPrincipal::on_Btn_Agregar_Usr_clicked()
 
     if(ventanaAgregarUsuario.exec() == QDialog::Accepted){
         agregar_usur_Foto ventanaAgregarUsrFoto;
-//        ventanaAgregarUsrFoto.setModal(false);
 
         connect( this,SIGNAL( RaspicamLista(const cv::Mat&) ),&ventanaAgregarUsrFoto,
                  SIGNAL(RaspicamLista(const cv::Mat&) ) );
@@ -264,7 +267,6 @@ void VentanaPrincipal::on_Btn_Desconectar_clicked()
 {
     Timer->stop(); /* Se detiene el Timer */
     Servidor.cerrarConexion();
-//    disconnect( this, SIGNAL( FrameListo() ),this,SLOT( SL_ReconocerRostros() ) );
     ui->Btn_Desconectar->hide();
     ui->Btn_Conectar->setVisible(true);
     ui->LEditIP->setEnabled(true);

@@ -1,8 +1,6 @@
 #ifndef _CAMARA_HPP_
 #define _CAMARA_HPP_
 
-//#include "cv.hpp"
-//#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
 
@@ -12,14 +10,11 @@ class Camara
 {
 public:
     Camara(int IndiceCamara = 0);
-//    ~Camara();
 
-    bool GetFrame(Mat&);
+    bool GetFrame(Mat& Almacen);
 
 private:
     VideoCapture FlujoVideo;
-
-    int id;
 };
 
 

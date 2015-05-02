@@ -19,6 +19,7 @@
 #include <QRegExpValidator>
 #include <QRegExp>
 #include "agregar_usur_finalizar.h"
+#include "manejoarchivos.hpp"
 
 namespace Ui {
 class VentanaPrincipal;
@@ -67,7 +68,6 @@ private:
 
     cv::Mat FrameRecibido;
     cv::Mat FrameProcesado;
-    int RangoConfianza;
 
     bool LeerArchivoConfig();
 };
